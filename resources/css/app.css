@@ -1,0 +1,231 @@
+:root {
+	--npc-deep: #0b0f14;
+	--npc-ocean: #c3002f;
+	--npc-teal: #e11d48;
+	--npc-sand: #f5f5f5;
+	--npc-ink: #0b0b0b;
+	--npc-muted: #5b6673;
+	--npc-card: #ffffff;
+	--npc-border: #e5e7eb;
+}
+
+body {
+	color: var(--npc-ink);
+	background: var(--npc-sand);
+	font-family: "Alegreya Sans", "Gill Sans", "Trebuchet MS", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
+.npc-navbar {
+	background: #ffffff;
+	border-bottom: 1px solid var(--npc-border);
+}
+
+.npc-navbar .navbar-brand {
+	letter-spacing: 0.02em;
+}
+
+.npc-navbar .nav-link {
+	color: var(--npc-deep);
+	font-weight: 600;
+}
+
+.npc-navbar .nav-link:hover {
+	color: var(--npc-ocean);
+}
+
+.npc-hero {
+	background: radial-gradient(1200px 600px at 10% 0%, #ffe5ea 0%, #f7f7f7 50%, #ffffff 100%);
+	border-bottom: 1px solid var(--npc-border);
+}
+
+.npc-hero .form-control,
+.npc-hero .form-select {
+	border-radius: 10px;
+}
+
+.npc-hero-card {
+	background: #ffffff;
+	border: 1px solid var(--npc-border);
+	border-radius: 16px;
+	box-shadow: 0 20px 40px rgba(16, 42, 67, 0.08);
+}
+
+.npc-section-title {
+	font-weight: 700;
+	letter-spacing: 0.01em;
+}
+
+.npc-chip {
+	background: #ffe5ea;
+	color: var(--npc-ocean);
+	border-radius: 999px;
+	font-weight: 600;
+	padding: 4px 12px;
+	font-size: 0.85rem;
+}
+
+.npc-card {
+	border: 1px solid var(--npc-border);
+	border-radius: 14px;
+	background: var(--npc-card);
+	box-shadow: 0 12px 28px rgba(16, 42, 67, 0.08);
+	overflow: hidden;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.npc-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 20px 40px rgba(16, 42, 67, 0.12);
+}
+
+.npc-card-img {
+	height: 200px;
+	background: linear-gradient(135deg, #ffe5ea, #f5f5f5);
+	background-size: cover;
+	background-position: center;
+}
+
+.npc-logo {
+	width: 56px;
+	height: 56px;
+	object-fit: cover;
+	border-radius: 14px;
+	border: 1px solid var(--npc-border);
+	margin-bottom: 12px;
+}
+
+.npc-price {
+	color: var(--npc-ocean);
+	font-weight: 700;
+}
+
+.npc-footer {
+	background: #0b0b0b;
+	color: #e2e8f0;
+}
+
+.npc-footer .text-muted {
+	color: #94a3b8 !important;
+}
+
+.npc-footer a {
+	color: #cbd5f5;
+	text-decoration: none;
+}
+
+.npc-footer a:hover {
+	color: #ffffff;
+}
+
+.npc-admin-sidebar {
+	background: #0b0b0b;
+	color: #e2e8f0;
+	min-height: 100vh;
+}
+
+.npc-admin-sidebar a {
+	color: #cbd5f5;
+	text-decoration: none;
+}
+
+.npc-admin-sidebar a.active,
+.npc-admin-sidebar a:hover {
+	color: #ffffff;
+}
+
+.npc-admin-card {
+	border: 1px solid var(--npc-border);
+	border-radius: 16px;
+	background: #ffffff;
+	box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+}
+
+.table thead th {
+	color: var(--npc-muted);
+	font-weight: 600;
+}
+
+.btn-primary {
+	background-color: var(--npc-ocean);
+	border-color: var(--npc-ocean);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+	background-color: #0b5f56;
+	border-color: #0b5f56;
+}
+
+.btn-outline-primary {
+	color: var(--npc-ocean);
+	border-color: var(--npc-ocean);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+	background-color: var(--npc-ocean);
+	border-color: var(--npc-ocean);
+}
+
+.gallery-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: 12px;
+}
+
+.gallery-item {
+	border: 1px solid var(--npc-border);
+	border-radius: 12px;
+	padding: 8px;
+	background: #ffffff;
+	text-align: center;
+}
+
+.gallery-item img {
+	width: 100%;
+	height: 90px;
+	object-fit: cover;
+	border-radius: 8px;
+}
+
+.gallery-item.dragging {
+	opacity: 0.6;
+}
+
+.listing-gallery {
+	display: grid;
+	gap: 12px;
+}
+
+.listing-main {
+	height: 360px;
+	border-radius: 16px;
+	background: linear-gradient(135deg, #d6e4ff, #ecfdf3);
+	background-size: cover;
+	background-position: center;
+}
+
+.listing-thumbs {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: 10px;
+}
+
+.listing-thumb {
+	border: 1px solid var(--npc-border);
+	border-radius: 10px;
+	padding: 0;
+	width: 100%;
+	height: 90px;
+	background-size: cover;
+	background-position: center;
+}
