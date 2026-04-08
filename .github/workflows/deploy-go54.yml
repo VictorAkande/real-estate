@@ -39,8 +39,8 @@ jobs:
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ftp.vicaliza.com.ng
-          username: akandevictor846@vicaliza.com.ng
+          server: ftp.worldensettler.com.ng
+          username: akandevictor@worldensettler.com.ng
           password: Okikiola1994@
           protocol: ftp
           port: 21
