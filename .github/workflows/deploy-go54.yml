@@ -3,7 +3,7 @@ name: Deploy to Go54 (cPanel)
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
