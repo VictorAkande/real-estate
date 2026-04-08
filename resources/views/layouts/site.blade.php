@@ -24,14 +24,11 @@
                         <li class="nav-item"><a class="nav-link" href="{{ route('agents') }}">Agents</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ route('market') }}">Market Trends</a></li>
                     </ul>
+                    @auth
                     <div class="d-flex gap-2">
-                        @auth
-                            <a class="btn btn-outline-primary" href="{{ route('dashboard') }}">Dashboard</a>
-                        @else
-                            <a class="btn btn-outline-primary" href="{{ route('login') }}">Log in</a>
-                            <a class="btn btn-primary" href="{{ route('register') }}">Register</a>
-                        @endauth
+                        <a class="btn btn-outline-primary" href="{{ route('dashboard') }}">Dashboard</a>
                     </div>
+                    @endauth
                 </div>
             </div>
         </nav>
