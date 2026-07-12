@@ -87,6 +87,35 @@
     }
 </script>
 
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="mb-4">
+            <h2 class="npc-section-title">Watch &amp; explore</h2>
+            <p class="text-muted">See what's available across our categories in under a minute.</p>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
+            @foreach ([
+                ['label' => 'Shortlet', 'video' => 'bqdEiKfdk_8', 'route' => 'shortlet'],
+                ['label' => 'Rental', 'video' => 'lCZTSPGAgUw', 'route' => 'rent'],
+                ['label' => 'Front Page', 'video' => 'tr9bpPCO9UI', 'route' => 'home'],
+                ['label' => 'Investment', 'video' => 'bYKSOd442mo', 'route' => 'market'],
+                ['label' => 'Realtors', 'video' => 'ifpPtWL5awY', 'route' => 'agents'],
+            ] as $video)
+                <div class="col">
+                    <div class="npc-card h-100">
+                        <div class="ratio ratio-9x16">
+                            <iframe src="https://www.youtube.com/embed/{{ $video['video'] }}" title="{{ $video['label'] }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                        <div class="p-3 text-center">
+                            <a class="btn btn-outline-primary btn-sm w-100" href="{{ route($video['route']) }}">{{ $video['label'] }}</a>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
 <section class="py-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
