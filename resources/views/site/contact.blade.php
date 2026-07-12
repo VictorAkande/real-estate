@@ -14,21 +14,28 @@
             <div class="col-lg-6">
                 <div class="npc-card p-4 h-100">
                     <h5 class="fw-bold">Send a message</h5>
-                    <form class="row g-3">
+                    @if (session('status'))
+                        <div class="alert alert-success">{{ session('status') }}</div>
+                    @endif
+                    <form class="row g-3" method="POST" action="{{ route('contact.send') }}">
+                        @csrf
                         <div class="col-md-6">
                             <label class="form-label">Full Name</label>
-                            <input class="form-control" placeholder="Your name" />
+                            <input class="form-control" name="name" value="{{ old('name') }}" placeholder="Your name" required />
+                            @error('name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Email</label>
-                            <input class="form-control" placeholder="you@example.com" />
+                            <input class="form-control" type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required />
+                            @error('email')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-12">
                             <label class="form-label">Message</label>
-                            <textarea class="form-control" rows="4" placeholder="How can we help?"></textarea>
+                            <textarea class="form-control" name="message" rows="4" placeholder="How can we help?" required>{{ old('message') }}</textarea>
+                            @error('message')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-12">
-                            <button class="btn btn-primary" type="button">Send message</button>
+                            <button class="btn btn-primary" type="submit">Send message</button>
                         </div>
                     </form>
                 </div>

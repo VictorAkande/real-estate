@@ -1,16 +1,23 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ListingEnquiryController;
 use App\Http\Controllers\Admin\AdminAgentController;
+use App\Http\Controllers\Admin\AdminAreaGuideController;
 use App\Http\Controllers\Admin\AdminContentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminListingController;
 use App\Http\Controllers\Admin\AdminLocationController;
+use App\Http\Controllers\Admin\AdminMarketTrendController;
+use App\Http\Controllers\Admin\AdminPostController;
 use App\Models\Agent;
+use App\Models\AreaGuide;
 use App\Models\ContentPage;
 use App\Models\Listing;
 use App\Models\Location;
+use App\Models\MarketTrend;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -102,20 +109,40 @@ Route::get('/developers', function () {
 })->name('developers');
 
 Route::get('/market-trends', function () {
-    return view('site.market');
+    return view('site.market', [
+        'trends' => MarketTrend::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get(),
+    ]);
 })->name('market');
 
 Route::get('/blog', function () {
-    return view('site.blog');
+    return view('site.blog', [
+        'posts' => Post::where('is_active', true)->latest()->paginate(9),
+    ]);
 })->name('blog');
 
+Route::get('/blog/{post:slug}', function (Post $post) {
+    return view('site.blog-show', compact('post'));
+})->name('blog.show');
+
 Route::get('/area-guides', function () {
-    return view('site.area-guides');
+    return view('site.area-guides', [
+        'areaGuides' => AreaGuide::where('is_active', true)->orderBy('name')->get(),
+    ]);
 })->name('areas');
+
+Route::get('/area-guides/{areaGuide:slug}', function (AreaGuide $areaGuide) {
+    return view('site.area-guide-show', compact('areaGuide'));
+})->name('areas.show');
 
 Route::get('/contact', function () {
     return view('site.contact');
 })->name('contact');
+
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.send');
+
+Route::get('/contact/thank-you', function () {
+    return view('site.contact-thank-you');
+})->name('contact.thankyou');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -130,6 +157,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('agents', AdminAgentController::class)->names('agents');
     Route::resource('locations', AdminLocationController::class)->names('locations');
     Route::resource('content', AdminContentController::class)->parameters(['content' => 'content_page'])->names('content');
+    Route::resource('market-trends', AdminMarketTrendController::class)->parameters(['market-trends' => 'market_trend'])->names('market-trends');
+    Route::resource('posts', AdminPostController::class)->names('posts');
+    Route::resource('area-guides', AdminAreaGuideController::class)->parameters(['area-guides' => 'area_guide'])->names('area-guides');
 });
 
 function listingSearch(Request $request, string $type)

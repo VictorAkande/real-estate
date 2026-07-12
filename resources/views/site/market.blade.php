@@ -11,27 +11,21 @@
 <section class="py-5">
     <div class="container">
         <div class="row g-4">
-            <div class="col-lg-4">
-                <div class="npc-card p-4 h-100">
-                    <h5 class="fw-bold">Average prices</h5>
-                    <p class="text-muted">Analyze pricing benchmarks for apartments, houses, and land.</p>
-                    <button class="btn btn-outline-primary">View report</button>
+            @forelse ($trends as $trend)
+                <div class="col-lg-4">
+                    <div class="npc-card p-4 h-100">
+                        @if ($trend->metric)
+                            <span class="badge text-bg-light mb-2">{{ $trend->metric }}</span>
+                        @endif
+                        <h5 class="fw-bold">{{ $trend->title }}</h5>
+                        <p class="text-muted">{{ $trend->description }}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="npc-card p-4 h-100">
-                    <h5 class="fw-bold">Demand hotspots</h5>
-                    <p class="text-muted">Spot fast-moving locations and track new demand signals.</p>
-                    <button class="btn btn-outline-primary">Explore demand</button>
+            @empty
+                <div class="col-12">
+                    <div class="alert alert-light">No market trends published yet.</div>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="npc-card p-4 h-100">
-                    <h5 class="fw-bold">Rental yields</h5>
-                    <p class="text-muted">Compare rental yields across leading neighborhoods.</p>
-                    <button class="btn btn-outline-primary">Compare yields</button>
-                </div>
-            </div>
+            @endforelse
         </div>
     </div>
 </section>

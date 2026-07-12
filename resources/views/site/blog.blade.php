@@ -11,17 +11,26 @@
 <section class="py-5">
     <div class="container">
         <div class="row g-4">
-            @foreach (range(1, 6) as $item)
+            @forelse ($posts as $post)
                 <div class="col-md-4">
-                    <div class="npc-card p-4 h-100">
-                        <span class="badge text-bg-light mb-2">Market Update</span>
-                        <h5 class="fw-bold">Top places to invest in {{ 2020 + $item }}</h5>
-                        <p class="text-muted">Understand demand trends, price signals, and investor activity.</p>
-                        <button class="btn btn-outline-primary btn-sm">Read more</button>
+                    <div class="npc-card h-100">
+                        @if ($post->cover_image)
+                            <div class="npc-card-img" style="background-image: url('{{ str_starts_with($post->cover_image, 'http') ? $post->cover_image : Storage::url($post->cover_thumb ?? $post->cover_image) }}');"></div>
+                        @endif
+                        <div class="p-4">
+                            <h5 class="fw-bold">{{ $post->title }}</h5>
+                            <p class="text-muted">{{ $post->excerpt }}</p>
+                            <a class="btn btn-outline-primary btn-sm" href="{{ route('blog.show', $post) }}">Read more</a>
+                        </div>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="col-12">
+                    <div class="alert alert-light">No blog posts published yet.</div>
+                </div>
+            @endforelse
         </div>
+        <div class="mt-4">{{ $posts->links() }}</div>
     </div>
 </section>
 @endsection

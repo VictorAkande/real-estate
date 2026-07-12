@@ -23,6 +23,9 @@
                         <a class="nav-link p-0 {{ request()->routeIs('admin.agents.*') ? 'active' : '' }}" href="{{ route('admin.agents.index') }}">Agents & Developers</a>
                         <a class="nav-link p-0 {{ request()->routeIs('admin.locations.*') ? 'active' : '' }}" href="{{ route('admin.locations.index') }}">Locations</a>
                         <a class="nav-link p-0 {{ request()->routeIs('admin.content.*') ? 'active' : '' }}" href="{{ route('admin.content.index') }}">Site Content</a>
+                        <a class="nav-link p-0 {{ request()->routeIs('admin.market-trends.*') ? 'active' : '' }}" href="{{ route('admin.market-trends.index') }}">Market Trends</a>
+                        <a class="nav-link p-0 {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}" href="{{ route('admin.posts.index') }}">Blog Posts</a>
+                        <a class="nav-link p-0 {{ request()->routeIs('admin.area-guides.*') ? 'active' : '' }}" href="{{ route('admin.area-guides.index') }}">Area Guides</a>
                     </nav>
                     <div class="mt-5">
                         <a class="btn btn-outline-light btn-sm w-100" href="{{ route('home') }}">Back to site</a>

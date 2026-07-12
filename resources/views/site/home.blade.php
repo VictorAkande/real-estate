@@ -75,15 +75,19 @@
     const heroTransaction = document.getElementById('heroTransaction');
 
     if (heroForm && heroTransaction) {
-        heroForm.addEventListener('submit', () => {
-            const value = heroTransaction.value || 'sale';
-            const map = {
-                sale: "{{ route('sale') }}",
-                rent: "{{ route('rent') }}",
-                shortlet: "{{ route('shortlet') }}",
-            };
-            heroForm.action = map[value] || "{{ route('sale') }}";
-        });
+        const routeMap = {
+            sale: "{{ route('sale') }}",
+            rent: "{{ route('rent') }}",
+            shortlet: "{{ route('shortlet') }}",
+        };
+
+        const syncAction = () => {
+            heroForm.action = routeMap[heroTransaction.value] || routeMap.sale;
+        };
+
+        syncAction();
+        heroTransaction.addEventListener('change', syncAction);
+        heroForm.addEventListener('submit', syncAction);
     }
 </script>
 
@@ -141,22 +145,9 @@
                     </div>
                 </div>
             @empty
-                @foreach ([
-                    ['name' => 'Summit Estates', 'focus' => 'Luxury homes and waterfront', 'region' => 'Lagos'],
-                    ['name' => 'Capital Living', 'focus' => 'Family homes and rentals', 'region' => 'Abuja'],
-                    ['name' => 'Harborline Realty', 'focus' => 'Commercial and industrial', 'region' => 'Port Harcourt'],
-                ] as $company)
-                    <div class="col-md-4">
-                        <div class="npc-card p-4 h-100">
-                            <h5 class="fw-bold mb-1">{{ $company['name'] }}</h5>
-                            <p class="text-muted mb-2">{{ $company['focus'] }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">{{ $company['region'] }}</span>
-                                <span class="badge text-bg-light">Top rated</span>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+                <div class="col-12">
+                    <div class="alert alert-light">No agents yet.</div>
+                </div>
             @endforelse
         </div>
     </div>
@@ -192,24 +183,9 @@
                     </a>
                 </div>
             @empty
-                @foreach ([
-                    ['title' => 'Elegant 4 Bedroom Detached', 'city' => 'Ikoyi, Lagos', 'price' => '₦1,550,000,000', 'meta' => '4 Beds · 5 Baths · 2 Parking'],
-                    ['title' => 'Prime Commercial Shopping Complex', 'city' => 'Epe, Lagos', 'price' => '₦500,000,000', 'meta' => '3 Floors · 18 Units'],
-                    ['title' => 'Demolishable Blocks of Flats', 'city' => 'Surulere, Lagos', 'price' => '₦250,000,000', 'meta' => '12 Units · 500 sqm'],
-                    ['title' => '6-Bedroom Luxury Duplex', 'city' => 'Victoria Island, Lagos', 'price' => '₦500,000,000', 'meta' => '6 Beds · 4 Baths'],
-                ] as $listing)
-                    <div class="col-md-6 col-lg-3">
-                        <div class="npc-card h-100">
-                            <div class="npc-card-img"></div>
-                            <div class="p-3">
-                                <h6 class="fw-bold mb-1">{{ $listing['title'] }}</h6>
-                                <p class="text-muted small mb-2">{{ $listing['city'] }}</p>
-                                <div class="npc-price">{{ $listing['price'] }}</div>
-                                <div class="text-muted small mt-1">{{ $listing['meta'] }}</div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+                <div class="col-12">
+                    <div class="alert alert-light">No listings yet.</div>
+                </div>
             @endforelse
         </div>
     </div>

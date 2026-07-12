@@ -11,15 +11,20 @@
 <section class="py-5">
     <div class="container">
         <div class="row g-4">
-            @foreach (['Ikoyi', 'Lekki', 'Maitama', 'Gwarinpa', 'Port Harcourt'] as $area)
+            @forelse ($areaGuides as $guide)
                 <div class="col-md-4">
                     <div class="npc-card p-4 h-100">
-                        <h5 class="fw-bold">{{ $area }}</h5>
-                        <p class="text-muted">Lifestyle overview, rental expectations, and local amenities.</p>
-                        <button class="btn btn-outline-primary btn-sm">View guide</button>
+                        <h5 class="fw-bold">{{ $guide->name }}</h5>
+                        <p class="text-muted small mb-2">{{ $guide->state }}</p>
+                        <p class="text-muted">{{ $guide->summary }}</p>
+                        <a class="btn btn-outline-primary btn-sm" href="{{ route('areas.show', $guide) }}">View guide</a>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="col-12">
+                    <div class="alert alert-light">No area guides published yet.</div>
+                </div>
+            @endforelse
         </div>
     </div>
 </section>

@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\GeneratesUniqueSlugs;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AdminLocationController extends Controller
 {
+    use GeneratesUniqueSlugs;
+
     public function index(): View
     {
         $locations = Location::latest()->paginate(12);
@@ -31,7 +33,7 @@ class AdminLocationController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
-        $data['slug'] = $this->uniqueSlug($data['name']);
+        $data['slug'] = $this->uniqueSlug(Location::class, $data['name']);
 
         Location::create($data);
 
@@ -52,7 +54,7 @@ class AdminLocationController extends Controller
         ]);
 
         if ($location->name !== $data['name']) {
-            $data['slug'] = $this->uniqueSlug($data['name'], $location->id);
+            $data['slug'] = $this->uniqueSlug(Location::class, $data['name'], 'slug', $location->id);
         }
 
         $location->update($data);
@@ -65,19 +67,5 @@ class AdminLocationController extends Controller
         $location->delete();
 
         return redirect()->route('admin.locations.index')->with('status', 'Location deleted.');
-    }
-
-    private function uniqueSlug(string $name, ?int $ignoreId = null): string
-    {
-        $base = Str::slug($name);
-        $slug = $base;
-        $counter = 1;
-
-        while (Location::where('slug', $slug)->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))->exists()) {
-            $slug = $base.'-'.$counter;
-            $counter++;
-        }
-
-        return $slug;
     }
 }

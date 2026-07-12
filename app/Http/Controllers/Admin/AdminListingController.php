@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\GeneratesUniqueSlugs;
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
 use App\Models\Listing;
@@ -10,11 +11,12 @@ use App\Models\Location;
 use App\Support\ImageUploader;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AdminListingController extends Controller
 {
+    use GeneratesUniqueSlugs;
+
     public function index(): View
     {
         $listings = Listing::with(['location', 'agent'])
@@ -55,7 +57,7 @@ class AdminListingController extends Controller
         ]);
 
         $data['featured'] = (bool) ($data['featured'] ?? false);
-        $data['slug'] = $this->uniqueSlug($data['title']);
+        $data['slug'] = $this->uniqueSlug(Listing::class, $data['title']);
 
         if ($request->hasFile('cover_image_file')) {
             $uploader = new ImageUploader();
@@ -103,7 +105,7 @@ class AdminListingController extends Controller
         $data['featured'] = (bool) ($data['featured'] ?? false);
 
         if ($listing->title !== $data['title']) {
-            $data['slug'] = $this->uniqueSlug($data['title'], $listing->id);
+            $data['slug'] = $this->uniqueSlug(Listing::class, $data['title'], 'slug', $listing->id);
         }
 
         if ($request->hasFile('cover_image_file')) {
@@ -131,20 +133,6 @@ class AdminListingController extends Controller
         $listing->delete();
 
         return redirect()->route('admin.listings.index')->with('status', 'Listing deleted.');
-    }
-
-    private function uniqueSlug(string $title, ?int $ignoreId = null): string
-    {
-        $base = Str::slug($title);
-        $slug = $base;
-        $counter = 1;
-
-        while (Listing::where('slug', $slug)->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))->exists()) {
-            $slug = $base.'-'.$counter;
-            $counter++;
-        }
-
-        return $slug;
     }
 
     public function uploadGallery(Request $request, Listing $listing): RedirectResponse
