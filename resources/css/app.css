@@ -229,3 +229,7 @@ h6 {
 	background-size: cover;
 	background-position: center;
 }
+
+.ratio-9x16 {
+	--bs-aspect-ratio: 177.7778%;
+}
