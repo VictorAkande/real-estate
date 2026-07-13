@@ -22,7 +22,7 @@
                         <li class="nav-item"><a class="nav-link" href="{{ route('rent') }}">Rent</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ route('shortlet') }}">Short Let</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ route('agents') }}">Agents</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('market') }}">Market Trends</a></li>
+                        {{-- Market Trends nav link hidden for MVP launch; route still live --}}
                     </ul>
                     @auth
                     <div class="d-flex gap-2">
@@ -45,8 +45,7 @@
                     <div class="col-6 col-lg-2">
                         <h6 class="text-uppercase text-muted">Company</h6>
                         <ul class="list-unstyled">
-                            <li><a href="{{ route('blog') }}">Property Blog</a></li>
-                            <li><a href="{{ route('areas') }}">Area Guides</a></li>
+                            {{-- Property Blog / Area Guides links hidden for MVP launch; routes still live --}}
                             <li><a href="{{ route('contact') }}">Contact Us</a></li>
                         </ul>
                     </div>
@@ -69,7 +68,7 @@
                     <div class="d-flex gap-3">
                         <a href="{{ route('agents') }}">Estate Agents</a>
                         <a href="{{ route('developers') }}">Developers</a>
-                        <a href="{{ route('market') }}">Market Trends</a>
+                        {{-- Market Trends link hidden for MVP launch; route still live --}}
                     </div>
                 </div>
             </div>
