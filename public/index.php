@@ -1,5 +1,12 @@
 <?php
 
+// Buffer all output so that any stray bytes emitted before the framework
+// finishes bootstrapping cannot flush to the client ahead of our headers
+// (this shared host has output_buffering disabled, which was silently
+// dropping every Set-Cookie header — including the session cookie —
+// and causing every login to fail CSRF verification with a 419).
+ob_start();
+
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
