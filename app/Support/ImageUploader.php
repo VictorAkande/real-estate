@@ -2,48 +2,70 @@
 
 namespace App\Support;
 
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
 
 class ImageUploader
 {
     public function upload(UploadedFile $file, string $directory, int $thumbWidth, int $thumbHeight): array
     {
-        $disk = Storage::disk('public');
-        $filename = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
-        $path = trim($directory, '/').'/'.$filename;
+        return $this->uploadFromPath($file->getRealPath(), $directory, $thumbWidth, $thumbHeight);
+    }
 
-        $disk->putFileAs($directory, $file, $filename);
+    public function uploadFromPath(string $absolutePath, string $directory, int $thumbWidth, int $thumbHeight): array
+    {
+        $result = Cloudinary::uploadApi()->upload($absolutePath, [
+            'folder' => trim($directory, '/'),
+        ]);
 
-        if (! extension_loaded('gd') || ! function_exists('gd_info')) {
-            return ['path' => $path, 'thumb' => null];
-        }
+        $path = $result['secure_url'];
 
-        $thumbFilename = Str::uuid()->toString().'.jpg';
-        $thumbPath = trim($directory, '/').'/thumbs/'.$thumbFilename;
+        return ['path' => $path, 'thumb' => self::thumbUrl($path, $thumbWidth, $thumbHeight)];
+    }
 
-        $manager = new ImageManager(new Driver());
-        $image = $manager->read($file->getRealPath());
-        $image->cover($thumbWidth, $thumbHeight);
-
-        $disk->put($thumbPath, (string) $image->toJpeg(85));
-
-        return ['path' => $path, 'thumb' => $thumbPath];
+    public static function thumbUrl(string $path, int $width, int $height): string
+    {
+        return str_replace(
+            '/upload/',
+            "/upload/c_fill,w_{$width},h_{$height},q_auto,f_auto/",
+            $path
+        );
     }
 
     public function delete(?string $path, ?string $thumb = null): void
     {
+        if (! $path) {
+            return;
+        }
+
+        if (str_starts_with($path, 'http')) {
+            $publicId = $this->publicIdFromUrl($path);
+
+            if ($publicId) {
+                Cloudinary::uploadApi()->destroy($publicId);
+            }
+
+            return;
+        }
+
         $disk = Storage::disk('public');
 
-        if ($path && $disk->exists($path)) {
+        if ($disk->exists($path)) {
             $disk->delete($path);
         }
 
         if ($thumb && $disk->exists($thumb)) {
             $disk->delete($thumb);
         }
+    }
+
+    private function publicIdFromUrl(string $url): ?string
+    {
+        if (! preg_match('#/upload/v\d+/(.+)\.[a-zA-Z0-9]+$#', $url, $matches)) {
+            return null;
+        }
+
+        return $matches[1];
     }
 }

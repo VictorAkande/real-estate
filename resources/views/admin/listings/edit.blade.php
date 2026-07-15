@@ -117,7 +117,7 @@
                 <div class="gallery-grid" id="galleryGrid">
                     @foreach ($gallery as $image)
                         <div class="gallery-item" draggable="true" data-id="{{ $image->id }}">
-                            <img src="{{ Storage::url($image->thumb_path ?? $image->image_path) }}" alt="Gallery image">
+                            <img src="{{ str_starts_with($image->thumb_path ?? $image->image_path, 'http') ? ($image->thumb_path ?? $image->image_path) : Storage::url($image->thumb_path ?? $image->image_path) }}" alt="Gallery image">
                             <button class="btn btn-sm btn-outline-danger mt-2" type="button" data-delete-url="{{ route('admin.listings.gallery.delete', [$listing, $image]) }}">Delete</button>
                         </div>
                     @endforeach

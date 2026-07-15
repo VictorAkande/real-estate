@@ -17,7 +17,7 @@
         <div class="row align-items-center gy-4">
             <div class="col-lg-6">
                 @if ($hero?->template === 'hero' && $hero?->image_path)
-                    <img class="img-fluid rounded-3 mb-3" src="{{ Storage::url($hero->image_path) }}" alt="Hero image">
+                    <img class="img-fluid rounded-3 mb-3" src="{{ str_starts_with($hero->image_path, 'http') ? $hero->image_path : Storage::url($hero->image_path) }}" alt="Hero image">
                 @endif
                 <span class="npc-chip">{{ $hero->subtitle ?? "Nigeria's property marketplace" }}</span>
                 <h1 class="display-5 fw-bold mt-3">{{ $hero->title ?? 'Find your next property in Nigeria' }}</h1>
@@ -199,7 +199,7 @@
                     <h4 class="fw-bold">{{ $marketBlock->title ?? 'Market demand trends' }}</h4>
                     <p class="text-muted">{{ $marketBlock->body ?? 'Track high-demand locations, price changes, and rental yields in real time.' }}</p>
                     @if ($marketBlock?->template === 'feature' && $marketBlock?->image_path)
-                        <img class="img-fluid rounded-3 mt-3" src="{{ Storage::url($marketBlock->image_path) }}" alt="Market insights">
+                        <img class="img-fluid rounded-3 mt-3" src="{{ str_starts_with($marketBlock->image_path, 'http') ? $marketBlock->image_path : Storage::url($marketBlock->image_path) }}" alt="Market insights">
                     @endif
                     @if ($marketBlock?->template === 'stats')
                         <div class="d-flex flex-wrap gap-2 mt-2">
@@ -215,7 +215,7 @@
                     <h4 class="fw-bold">{{ $listBlock->title ?? 'List property in minutes' }}</h4>
                     <p class="text-muted">{{ $listBlock->body ?? 'Agents and developers can reach serious property hunters nationwide.' }}</p>
                     @if ($listBlock?->template === 'feature' && $listBlock?->image_path)
-                        <img class="img-fluid rounded-3 mb-3" src="{{ Storage::url($listBlock->image_path) }}" alt="List property">
+                        <img class="img-fluid rounded-3 mb-3" src="{{ str_starts_with($listBlock->image_path, 'http') ? $listBlock->image_path : Storage::url($listBlock->image_path) }}" alt="List property">
                     @endif
                     <a class="btn btn-primary" href="{{ $listBlock->cta_link ?? route('agents') }}">{{ $listBlock->cta_text ?? 'Get started' }}</a>
                 </div>

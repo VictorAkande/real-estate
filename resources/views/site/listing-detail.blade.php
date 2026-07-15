@@ -23,16 +23,17 @@
                 <div class="npc-card p-3">
                     <div class="listing-gallery">
                         @php
+                            $imageUrl = fn (?string $path) => $path && str_starts_with($path, 'http') ? $path : Storage::url($path);
                             $cover = $listing->cover_image
-                                ? (str_starts_with($listing->cover_image, 'http') ? $listing->cover_image : Storage::url($listing->cover_image))
+                                ? $imageUrl($listing->cover_image)
                                 : ($listing->images->first()
-                                    ? Storage::url($listing->images->first()->image_path)
+                                    ? $imageUrl($listing->images->first()->image_path)
                                     : null);
                         @endphp
                         <div class="listing-main" style="background-image: url('{{ $cover }}');"></div>
                         <div class="listing-thumbs">
                             @foreach ($listing->images as $image)
-                                <button type="button" class="listing-thumb" data-image="{{ Storage::url($image->image_path) }}" style="background-image: url('{{ Storage::url($image->thumb_path ?? $image->image_path) }}');"></button>
+                                <button type="button" class="listing-thumb" data-image="{{ $imageUrl($image->image_path) }}" style="background-image: url('{{ $imageUrl($image->thumb_path ?? $image->image_path) }}');"></button>
                             @endforeach
                         </div>
                     </div>
