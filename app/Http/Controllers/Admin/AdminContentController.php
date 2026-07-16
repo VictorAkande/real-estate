@@ -40,9 +40,13 @@ class AdminContentController extends Controller
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
 
         if ($request->hasFile('image_file')) {
-            $uploader = new ImageUploader();
-            $upload = $uploader->upload($request->file('image_file'), 'content', 1000, 700);
-            $data['image_path'] = $upload['path'];
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('image_file'), 'content', 1000, 700);
+                $data['image_path'] = $upload['path'];
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['image_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
         }
 
         ContentPage::create($data);
@@ -72,10 +76,14 @@ class AdminContentController extends Controller
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
 
         if ($request->hasFile('image_file')) {
-            $uploader = new ImageUploader();
-            $uploader->delete($content_page->image_path, null);
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('image_file'), 'content', 1000, 700);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['image_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
 
-            $upload = $uploader->upload($request->file('image_file'), 'content', 1000, 700);
+            $uploader->delete($content_page->image_path, null);
             $data['image_path'] = $upload['path'];
         }
 

@@ -41,10 +41,14 @@ class AdminAreaGuideController extends Controller
         $data['slug'] = $this->uniqueSlug(AreaGuide::class, $data['name']);
 
         if ($request->hasFile('cover_image_file')) {
-            $uploader = new ImageUploader();
-            $upload = $uploader->upload($request->file('cover_image_file'), 'area-guides', 900, 600);
-            $data['cover_image'] = $upload['path'];
-            $data['cover_thumb'] = $upload['thumb'];
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('cover_image_file'), 'area-guides', 900, 600);
+                $data['cover_image'] = $upload['path'];
+                $data['cover_thumb'] = $upload['thumb'];
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['cover_image_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
         }
 
         AreaGuide::create($data);
@@ -75,10 +79,14 @@ class AdminAreaGuideController extends Controller
         }
 
         if ($request->hasFile('cover_image_file')) {
-            $uploader = new ImageUploader();
-            $uploader->delete($area_guide->cover_image, $area_guide->cover_thumb);
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('cover_image_file'), 'area-guides', 900, 600);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['cover_image_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
 
-            $upload = $uploader->upload($request->file('cover_image_file'), 'area-guides', 900, 600);
+            $uploader->delete($area_guide->cover_image, $area_guide->cover_thumb);
             $data['cover_image'] = $upload['path'];
             $data['cover_thumb'] = $upload['thumb'];
         }

@@ -42,10 +42,14 @@ class AdminAgentController extends Controller
         $data['is_developer'] = (bool) ($data['is_developer'] ?? false);
 
         if ($request->hasFile('logo_file')) {
-            $uploader = new ImageUploader();
-            $upload = $uploader->upload($request->file('logo_file'), 'agents', 240, 240);
-            $data['logo_url'] = $upload['path'];
-            $data['logo_thumb'] = $upload['thumb'];
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('logo_file'), 'agents', 240, 240);
+                $data['logo_url'] = $upload['path'];
+                $data['logo_thumb'] = $upload['thumb'];
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['logo_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
         }
 
         Agent::create($data);
@@ -77,10 +81,14 @@ class AdminAgentController extends Controller
         $data['is_developer'] = (bool) ($data['is_developer'] ?? false);
 
         if ($request->hasFile('logo_file')) {
-            $uploader = new ImageUploader();
-            $uploader->delete($agent->logo_url, $agent->logo_thumb);
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('logo_file'), 'agents', 240, 240);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['logo_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
 
-            $upload = $uploader->upload($request->file('logo_file'), 'agents', 240, 240);
+            $uploader->delete($agent->logo_url, $agent->logo_thumb);
             $data['logo_url'] = $upload['path'];
             $data['logo_thumb'] = $upload['thumb'];
         }

@@ -15,6 +15,10 @@ class ImageUploader
 
     public function uploadFromPath(string $absolutePath, string $directory, int $thumbWidth, int $thumbHeight): array
     {
+        if (! config('filesystems.disks.cloudinary.url')) {
+            throw new \RuntimeException('Cloudinary is not configured: set CLOUDINARY_URL in the environment.');
+        }
+
         $result = Cloudinary::uploadApi()->upload($absolutePath, [
             'folder' => trim($directory, '/'),
         ]);

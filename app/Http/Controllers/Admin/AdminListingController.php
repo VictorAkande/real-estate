@@ -60,10 +60,14 @@ class AdminListingController extends Controller
         $data['slug'] = $this->uniqueSlug(Listing::class, $data['title']);
 
         if ($request->hasFile('cover_image_file')) {
-            $uploader = new ImageUploader();
-            $upload = $uploader->upload($request->file('cover_image_file'), 'listings', 640, 420);
-            $data['cover_image'] = $upload['path'];
-            $data['cover_thumb'] = $upload['thumb'];
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('cover_image_file'), 'listings', 640, 420);
+                $data['cover_image'] = $upload['path'];
+                $data['cover_thumb'] = $upload['thumb'];
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['cover_image_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
         }
 
         Listing::create($data);
@@ -109,10 +113,14 @@ class AdminListingController extends Controller
         }
 
         if ($request->hasFile('cover_image_file')) {
-            $uploader = new ImageUploader();
-            $uploader->delete($listing->cover_image, $listing->cover_thumb);
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('cover_image_file'), 'listings', 640, 420);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['cover_image_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
 
-            $upload = $uploader->upload($request->file('cover_image_file'), 'listings', 640, 420);
+            $uploader->delete($listing->cover_image, $listing->cover_thumb);
             $data['cover_image'] = $upload['path'];
             $data['cover_thumb'] = $upload['thumb'];
         }
@@ -145,16 +153,20 @@ class AdminListingController extends Controller
         $orderStart = (int) $listing->images()->max('sort_order');
         $uploader = new ImageUploader();
 
-        foreach ($request->file('gallery_images', []) as $file) {
-            $orderStart++;
-            $upload = $uploader->upload($file, 'listings/gallery', 900, 600);
+        try {
+            foreach ($request->file('gallery_images', []) as $file) {
+                $orderStart++;
+                $upload = $uploader->upload($file, 'listings/gallery', 900, 600);
 
-            ListingImage::create([
-                'listing_id' => $listing->id,
-                'image_path' => $upload['path'],
-                'thumb_path' => $upload['thumb'],
-                'sort_order' => $orderStart,
-            ]);
+                ListingImage::create([
+                    'listing_id' => $listing->id,
+                    'image_path' => $upload['path'],
+                    'thumb_path' => $upload['thumb'],
+                    'sort_order' => $orderStart,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            return back()->withErrors(['gallery_images' => 'Image upload failed: '.$e->getMessage()]);
         }
 
         return redirect()->route('admin.listings.edit', $listing)->with('status', 'Gallery images uploaded.');

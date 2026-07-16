@@ -40,10 +40,14 @@ class AdminPostController extends Controller
         $data['slug'] = $this->uniqueSlug(Post::class, $data['title']);
 
         if ($request->hasFile('cover_image_file')) {
-            $uploader = new ImageUploader();
-            $upload = $uploader->upload($request->file('cover_image_file'), 'posts', 900, 600);
-            $data['cover_image'] = $upload['path'];
-            $data['cover_thumb'] = $upload['thumb'];
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('cover_image_file'), 'posts', 900, 600);
+                $data['cover_image'] = $upload['path'];
+                $data['cover_thumb'] = $upload['thumb'];
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['cover_image_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
         }
 
         Post::create($data);
@@ -73,10 +77,14 @@ class AdminPostController extends Controller
         }
 
         if ($request->hasFile('cover_image_file')) {
-            $uploader = new ImageUploader();
-            $uploader->delete($post->cover_image, $post->cover_thumb);
+            try {
+                $uploader = new ImageUploader();
+                $upload = $uploader->upload($request->file('cover_image_file'), 'posts', 900, 600);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['cover_image_file' => 'Image upload failed: '.$e->getMessage()]);
+            }
 
-            $upload = $uploader->upload($request->file('cover_image_file'), 'posts', 900, 600);
+            $uploader->delete($post->cover_image, $post->cover_thumb);
             $data['cover_image'] = $upload['path'];
             $data['cover_thumb'] = $upload['thumb'];
         }
