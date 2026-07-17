@@ -9,6 +9,7 @@ use App\Models\Listing;
 use App\Models\ListingImage;
 use App\Models\Location;
 use App\Support\ImageUploader;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -54,7 +55,15 @@ class AdminListingController extends Controller
             'cover_image' => ['nullable', 'string', 'max:255'],
             'cover_image_file' => ['nullable', 'image', 'max:4096'],
             'description' => ['nullable', 'string'],
+            'gallery_paths' => ['nullable', 'array'],
+            'gallery_paths.*' => ['nullable', 'string'],
+            'gallery_thumbs' => ['nullable', 'array'],
+            'gallery_thumbs.*' => ['nullable', 'string'],
         ]);
+
+        $galleryPaths = $data['gallery_paths'] ?? [];
+        $galleryThumbs = $data['gallery_thumbs'] ?? [];
+        unset($data['gallery_paths'], $data['gallery_thumbs']);
 
         $data['featured'] = (bool) ($data['featured'] ?? false);
         $data['slug'] = $this->uniqueSlug(Listing::class, $data['title']);
@@ -70,7 +79,20 @@ class AdminListingController extends Controller
             }
         }
 
-        Listing::create($data);
+        $listing = Listing::create($data);
+
+        foreach ($galleryPaths as $index => $path) {
+            if (! $path) {
+                continue;
+            }
+
+            ListingImage::create([
+                'listing_id' => $listing->id,
+                'image_path' => $path,
+                'thumb_path' => $galleryThumbs[$index] ?? null,
+                'sort_order' => $index + 1,
+            ]);
+        }
 
         return redirect()->route('admin.listings.index')->with('status', 'Listing created.');
     }
@@ -170,6 +192,21 @@ class AdminListingController extends Controller
         }
 
         return redirect()->route('admin.listings.edit', $listing)->with('status', 'Gallery images uploaded.');
+    }
+
+    public function uploadGalleryImageAjax(Request $request): JsonResponse
+    {
+        $request->validate([
+            'image' => ['required', 'image', 'max:4096'],
+        ]);
+
+        try {
+            $upload = (new ImageUploader())->upload($request->file('image'), 'listings/gallery', 900, 600);
+        } catch (\Throwable $e) {
+            return response()->json(['message' => 'Image upload failed: '.$e->getMessage()], 422);
+        }
+
+        return response()->json($upload);
     }
 
     public function reorderGallery(Request $request, Listing $listing): RedirectResponse

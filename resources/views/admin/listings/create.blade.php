@@ -88,10 +88,96 @@
             <label class="form-label">Description</label>
             <textarea class="form-control" name="description" rows="4">{{ old('description') }}</textarea>
         </div>
+        <div class="col-12">
+            <label class="form-label">Gallery Images</label>
+            <input class="form-control" type="file" id="galleryFileInput" multiple accept="image/*">
+            <div class="small text-muted mt-1" id="galleryUploadStatus"></div>
+            <div class="d-flex flex-wrap gap-2 mt-2" id="galleryPreview"></div>
+        </div>
         <div class="col-12 d-flex gap-2">
             <button class="btn btn-primary" type="submit">Save listing</button>
             <a class="btn btn-outline-secondary" href="{{ route('admin.listings.index') }}">Cancel</a>
         </div>
     </form>
 </div>
+
+<script>
+    (function () {
+        const input = document.getElementById('galleryFileInput');
+        const preview = document.getElementById('galleryPreview');
+        const status = document.getElementById('galleryUploadStatus');
+
+        if (!input) {
+            return;
+        }
+
+        const uploadUrl = '{{ route('admin.listings.gallery.ajax-upload') }}';
+        const csrfToken = '{{ csrf_token() }}';
+
+        input.addEventListener('change', async () => {
+            const files = Array.from(input.files);
+            input.value = '';
+
+            for (const file of files) {
+                status.textContent = `Uploading ${file.name}...`;
+
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('_token', csrfToken);
+
+                try {
+                    const response = await fetch(uploadUrl, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json' },
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Upload failed');
+                    }
+
+                    addGalleryItem(data.path, data.thumb);
+                } catch (err) {
+                    status.textContent = `Failed to upload ${file.name}: ${err.message}`;
+                    return;
+                }
+            }
+
+            status.textContent = files.length ? 'All images uploaded.' : '';
+        });
+
+        function addGalleryItem(path, thumb) {
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'width:120px;';
+
+            const img = document.createElement('img');
+            img.src = thumb || path;
+            img.style.cssText = 'width:120px;height:80px;object-fit:cover;border-radius:6px;display:block;';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-sm btn-outline-danger mt-1 w-100';
+            removeBtn.textContent = 'Remove';
+            removeBtn.addEventListener('click', () => wrapper.remove());
+
+            const pathInput = document.createElement('input');
+            pathInput.type = 'hidden';
+            pathInput.name = 'gallery_paths[]';
+            pathInput.value = path;
+
+            const thumbInput = document.createElement('input');
+            thumbInput.type = 'hidden';
+            thumbInput.name = 'gallery_thumbs[]';
+            thumbInput.value = thumb || '';
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(pathInput);
+            wrapper.appendChild(thumbInput);
+            wrapper.appendChild(removeBtn);
+            preview.appendChild(wrapper);
+        }
+    })();
+</script>
 @endsection

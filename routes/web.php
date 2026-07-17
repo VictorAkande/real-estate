@@ -151,6 +151,7 @@ Route::get('/dashboard', function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('listings', AdminListingController::class)->names('listings');
+    Route::post('listings/gallery/ajax-upload', [AdminListingController::class, 'uploadGalleryImageAjax'])->name('listings.gallery.ajax-upload');
     Route::post('listings/{listing}/gallery', [AdminListingController::class, 'uploadGallery'])->name('listings.gallery.upload');
     Route::post('listings/{listing}/gallery/order', [AdminListingController::class, 'reorderGallery'])->name('listings.gallery.order');
     Route::delete('listings/{listing}/gallery/{image}', [AdminListingController::class, 'deleteGalleryImage'])->name('listings.gallery.delete');
