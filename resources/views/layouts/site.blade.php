@@ -7,12 +7,20 @@
 
         <title>{{ $title ?? config('app.name', 'Worlden Settler Properties') }}</title>
 
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16.png') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+
         @vite(['resources/js/app.js', 'resources/css/app.css'])
     </head>
     <body class="bg-light">
         <nav class="navbar navbar-expand-lg navbar-light npc-navbar sticky-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="{{ route('home') }}">Worlden Settler Properties</a>
+                <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ route('home') }}">
+                    <img src="{{ asset('images/logo-navbar.png') }}" alt="Worlden Settler Properties" height="44">
+                    <span>Worlden Settler Properties</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
