@@ -52,6 +52,41 @@ h6 {
 	border-radius: 10px;
 }
 
+.npc-hero-photo {
+	position: relative;
+	background-size: cover;
+	background-position: center;
+	color: #ffffff;
+	border-bottom: none;
+	overflow: hidden;
+}
+
+.npc-hero-photo::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(11, 15, 20, 0.55) 0%, rgba(11, 15, 20, 0.78) 100%);
+}
+
+.npc-hero-photo > .container {
+	position: relative;
+	z-index: 1;
+}
+
+.npc-hero-photo h1,
+.npc-hero-photo p {
+	color: #ffffff;
+}
+
+.npc-hero-photo .text-muted {
+	color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.npc-hero-photo .npc-chip {
+	background: rgba(255, 255, 255, 0.18);
+	color: #ffffff;
+}
+
 .npc-hero-card {
 	background: #ffffff;
 	border: 1px solid var(--npc-border);

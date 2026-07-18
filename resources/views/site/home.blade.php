@@ -10,15 +10,16 @@
     $marketStats = $marketBlock?->template === 'stats' && $marketBlock->body
         ? array_filter(array_map('trim', explode("\n", $marketBlock->body)))
         : [];
+    $heroHasImage = $hero?->template === 'hero' && $hero?->image_path;
+    $heroImageUrl = $heroHasImage
+        ? (str_starts_with($hero->image_path, 'http') ? $hero->image_path : Storage::url($hero->image_path))
+        : null;
 @endphp
 
-<section class="npc-hero py-5">
+<section class="npc-hero py-5 {{ $heroHasImage ? 'npc-hero-photo' : '' }}" @if ($heroImageUrl) style="background-image: url('{{ $heroImageUrl }}');" @endif>
     <div class="container">
         <div class="row align-items-center gy-4">
             <div class="col-lg-6">
-                @if ($hero?->template === 'hero' && $hero?->image_path)
-                    <img class="img-fluid rounded-3 mb-3" src="{{ str_starts_with($hero->image_path, 'http') ? $hero->image_path : Storage::url($hero->image_path) }}" alt="Hero image">
-                @endif
                 <span class="npc-chip">{{ $hero->subtitle ?? "Nigeria's property marketplace" }}</span>
                 <h1 class="display-5 fw-bold mt-3">{{ $hero->title ?? 'Find your next property in Nigeria' }}</h1>
                 <p class="lead text-muted">{{ $hero->body ?? 'Search verified homes, land, and commercial spaces. Compare listings, connect with trusted agents, and move with confidence.' }}</p>
