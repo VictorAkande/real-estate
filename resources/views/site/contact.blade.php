@@ -46,6 +46,10 @@
                     <p class="text-muted">Reach our team for agent partnerships, listings, and media requests.</p>
                     <div class="d-flex flex-column gap-2">
                         <div class="d-flex justify-content-between">
+                            <span class="text-muted">Company email</span>
+                            <a href="mailto:worldensettlerproperties@gmail.com">worldensettlerproperties@gmail.com</a>
+                        </div>
+                        <div class="d-flex justify-content-between">
                             <span class="text-muted">Response time</span>
                             <span>Within 24 hours</span>
                         </div>

@@ -49,6 +49,7 @@
                     <div class="col-lg-4">
                         <h5 class="fw-bold">Worlden Settler Properties</h5>
                         <p class="text-muted">Discover verified listings, connect with trusted professionals, and monitor market trends across Nigeria.</p>
+                        <p class="text-muted mb-0"><a href="mailto:worldensettlerproperties@gmail.com" class="text-muted">worldensettlerproperties@gmail.com</a></p>
                     </div>
                     <div class="col-6 col-lg-2">
                         <h6 class="text-uppercase text-muted">Company</h6>

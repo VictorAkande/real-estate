@@ -105,6 +105,7 @@
                 ['label' => 'Front Page', 'video' => 'tr9bpPCO9UI', 'route' => 'home'],
                 ['label' => 'Investment', 'video' => 'bYKSOd442mo', 'route' => 'market'],
                 ['label' => 'Realtors', 'video' => 'ifpPtWL5awY', 'route' => 'agents'],
+                ['label' => 'Not yet upload', 'video' => 'dZrhegqp9Jw', 'href' => 'https://youtube.com/shorts/dZrhegqp9Jw?si=bSN2hR6qtcZ4Ltxc'],
             ] as $video)
                 <div class="col">
                     <div class="npc-card h-100">
@@ -112,7 +113,7 @@
                             <iframe src="https://www.youtube.com/embed/{{ $video['video'] }}" title="{{ $video['label'] }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
                         </div>
                         <div class="p-3 text-center">
-                            <a class="btn btn-outline-primary btn-sm w-100" href="{{ route($video['route']) }}">{{ $video['label'] }}</a>
+                            <a class="btn btn-outline-primary btn-sm w-100" href="{{ $video['href'] ?? route($video['route']) }}" @if(isset($video['href'])) target="_blank" rel="noopener" @endif>{{ $video['label'] }}</a>
                         </div>
                     </div>
                 </div>
