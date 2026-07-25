@@ -181,7 +181,11 @@
                                 <p class="text-muted small mb-2">{{ $listing->location->name ?? 'Nigeria' }}</p>
                                 <div class="npc-price">₦{{ number_format($listing->price, 2) }}</div>
                                 <div class="text-muted small mt-1">
-                                    {{ $listing->bedrooms ?? 0 }} Beds · {{ $listing->bathrooms ?? 0 }} Baths · {{ $listing->parking_spaces ?? 0 }} Parking
+                                    @if ($listing->listing_type === 'land')
+                                        {{ $listing->area_sqm ?? 'N/A' }} sqm · {{ $listing->property_type }}
+                                    @else
+                                        {{ $listing->bedrooms ?? 0 }} Beds · {{ $listing->bathrooms ?? 0 }} Baths · {{ $listing->parking_spaces ?? 0 }} Parking
+                                    @endif
                                 </div>
                             </div>
                         </div>

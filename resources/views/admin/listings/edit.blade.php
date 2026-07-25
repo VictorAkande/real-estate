@@ -29,19 +29,19 @@
             <label class="form-label">Status</label>
             <input class="form-control" name="status" value="{{ old('status', $listing->status) }}" required>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 js-residential-field">
             <label class="form-label">Bedrooms</label>
             <input class="form-control" name="bedrooms" value="{{ old('bedrooms', $listing->bedrooms) }}">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 js-residential-field">
             <label class="form-label">Bathrooms</label>
             <input class="form-control" name="bathrooms" value="{{ old('bathrooms', $listing->bathrooms) }}">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 js-residential-field">
             <label class="form-label">Toilets</label>
             <input class="form-control" name="toilets" value="{{ old('toilets', $listing->toilets) }}">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 js-residential-field">
             <label class="form-label">Parking</label>
             <input class="form-control" name="parking_spaces" value="{{ old('parking_spaces', $listing->parking_spaces) }}">
         </div>
@@ -131,6 +131,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        const typeSelect = document.querySelector('select[name="listing_type"]');
+        const residentialFields = document.querySelectorAll('.js-residential-field');
+
+        const syncResidentialFields = () => {
+            const isLand = typeSelect.value === 'land';
+            residentialFields.forEach((field) => {
+                field.classList.toggle('d-none', isLand);
+                field.querySelectorAll('input').forEach((input) => {
+                    if (isLand) {
+                        input.dataset.prevValue = input.value;
+                        input.value = '';
+                    } else if (input.dataset.prevValue !== undefined) {
+                        input.value = input.dataset.prevValue;
+                    }
+                });
+            });
+        };
+
+        if (typeSelect) {
+            syncResidentialFields();
+            typeSelect.addEventListener('change', syncResidentialFields);
+        }
+    })();
+</script>
 
 <script>
     const grid = document.getElementById('galleryGrid');

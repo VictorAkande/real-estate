@@ -26,15 +26,17 @@
                     <label class="form-label">Property Type</label>
                     <input class="form-control" name="property_type" value="{{ request('property_type') }}" placeholder="Apartment, Land, Commercial">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">Beds</label>
-                    <select class="form-select" name="bedrooms">
-                        <option value="">Any</option>
-                        @foreach ([1,2,3,4,5] as $bed)
-                            <option value="{{ $bed }}" @selected(request('bedrooms') == $bed)>{{ $bed }}+</option>
-                        @endforeach
-                    </select>
-                </div>
+                @if (($type ?? null) !== 'land')
+                    <div class="col-md-2">
+                        <label class="form-label">Beds</label>
+                        <select class="form-select" name="bedrooms">
+                            <option value="">Any</option>
+                            @foreach ([1,2,3,4,5] as $bed)
+                                <option value="{{ $bed }}" @selected(request('bedrooms') == $bed)>{{ $bed }}+</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
                 <div class="col-md-2">
                     <label class="form-label">Min Price</label>
                     <input class="form-control" name="min_price" value="{{ request('min_price') }}" placeholder="0">
@@ -72,7 +74,11 @@
                                 <p class="text-muted small mb-2">{{ $listing->location->name ?? 'Nigeria' }}</p>
                                 <div class="npc-price">₦{{ number_format($listing->price, 2) }}</div>
                                 <div class="text-muted small mt-1">
-                                    {{ $listing->bedrooms ?? 0 }} Beds · {{ $listing->bathrooms ?? 0 }} Baths · {{ $listing->parking_spaces ?? 0 }} Parking
+                                    @if ($listing->listing_type === 'land')
+                                        {{ $listing->area_sqm ?? 'N/A' }} sqm · {{ $listing->property_type }}
+                                    @else
+                                        {{ $listing->bedrooms ?? 0 }} Beds · {{ $listing->bathrooms ?? 0 }} Baths · {{ $listing->parking_spaces ?? 0 }} Parking
+                                    @endif
                                 </div>
                             </div>
                         </div>

@@ -42,10 +42,12 @@
                 <div class="npc-card p-4 mt-4">
                     <h4 class="fw-bold">Property details</h4>
                     <div class="row text-muted mt-3">
-                        <div class="col-6 col-md-3">{{ $listing->bedrooms ?? 0 }} Beds</div>
-                        <div class="col-6 col-md-3">{{ $listing->bathrooms ?? 0 }} Baths</div>
-                        <div class="col-6 col-md-3">{{ $listing->toilets ?? 0 }} Toilets</div>
-                        <div class="col-6 col-md-3">{{ $listing->parking_spaces ?? 0 }} Parking</div>
+                        @if ($listing->listing_type !== 'land')
+                            <div class="col-6 col-md-3">{{ $listing->bedrooms ?? 0 }} Beds</div>
+                            <div class="col-6 col-md-3">{{ $listing->bathrooms ?? 0 }} Baths</div>
+                            <div class="col-6 col-md-3">{{ $listing->toilets ?? 0 }} Toilets</div>
+                            <div class="col-6 col-md-3">{{ $listing->parking_spaces ?? 0 }} Parking</div>
+                        @endif
                         <div class="col-6 col-md-3 mt-3">{{ $listing->area_sqm ?? 'N/A' }} sqm</div>
                         <div class="col-6 col-md-3 mt-3">{{ $listing->property_type }}</div>
                     </div>
