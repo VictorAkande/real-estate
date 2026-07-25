@@ -81,6 +81,16 @@ Route::get('/short-let', function (Request $request) {
     ]);
 })->name('shortlet');
 
+Route::get('/land', function (Request $request) {
+    return view('site.listings', [
+        'title' => 'Land for Sale',
+        'tagline' => 'Browse verified land and plots across Nigeria.',
+        'listings' => listingSearch($request, 'land'),
+        'locations' => Location::orderBy('name')->get(),
+        'type' => 'land',
+    ]);
+})->name('land');
+
 Route::get('/listing/{listing:slug}', function (Listing $listing) {
     $listing->load(['location', 'agent', 'images']);
 

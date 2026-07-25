@@ -39,7 +39,7 @@ class AdminListingController extends Controller
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'listing_type' => ['required', 'in:sale,rent,shortlet'],
+            'listing_type' => ['required', 'in:sale,rent,shortlet,land'],
             'property_type' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
             'bedrooms' => ['nullable', 'integer', 'min:0'],
@@ -110,7 +110,7 @@ class AdminListingController extends Controller
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'listing_type' => ['required', 'in:sale,rent,shortlet'],
+            'listing_type' => ['required', 'in:sale,rent,shortlet,land'],
             'property_type' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
             'bedrooms' => ['nullable', 'integer', 'min:0'],

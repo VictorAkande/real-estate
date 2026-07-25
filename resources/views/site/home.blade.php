@@ -38,6 +38,7 @@
                                 <option value="sale">Buy</option>
                                 <option value="rent">Rent</option>
                                 <option value="shortlet">Short Let</option>
+                                <option value="land">Land</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -80,6 +81,7 @@
             sale: "{{ route('sale') }}",
             rent: "{{ route('rent') }}",
             shortlet: "{{ route('shortlet') }}",
+            land: "{{ route('land') }}",
         };
 
         const syncAction = () => {
@@ -165,6 +167,7 @@
             <div class="d-flex gap-2">
                 <a class="btn btn-outline-primary" href="{{ route('sale') }}">For Sale</a>
                 <a class="btn btn-outline-primary" href="{{ route('rent') }}">For Rent</a>
+                <a class="btn btn-outline-primary" href="{{ route('land') }}">Land</a>
             </div>
         </div>
         <div class="row g-4">

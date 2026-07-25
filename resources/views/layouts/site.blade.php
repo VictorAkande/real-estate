@@ -29,6 +29,7 @@
                         <li class="nav-item"><a class="nav-link" href="{{ route('sale') }}">Buy</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ route('rent') }}">Rent</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ route('shortlet') }}">Short Let</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('land') }}">Land</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ route('agents') }}">Agents</a></li>
                         {{-- Market Trends nav link hidden for MVP launch; route still live --}}
                     </ul>
@@ -64,6 +65,7 @@
                             <li><a href="{{ route('sale') }}">For Sale</a></li>
                             <li><a href="{{ route('rent') }}">For Rent</a></li>
                             <li><a href="{{ route('shortlet') }}">Short Let</a></li>
+                            <li><a href="{{ route('land') }}">Land</a></li>
                         </ul>
                     </div>
                     <div class="col-lg-4">

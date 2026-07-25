@@ -12,7 +12,7 @@
         <div class="col-md-4">
             <label class="form-label">Listing Type</label>
             <select class="form-select" name="listing_type" required>
-                @foreach (['sale' => 'Sale', 'rent' => 'Rent', 'shortlet' => 'Short Let'] as $value => $label)
+                @foreach (['sale' => 'Sale', 'rent' => 'Rent', 'shortlet' => 'Short Let', 'land' => 'Land'] as $value => $label)
                     <option value="{{ $value }}" @selected(old('listing_type', $listing->listing_type) === $value)>{{ $label }}</option>
                 @endforeach
             </select>
