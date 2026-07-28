@@ -107,7 +107,7 @@
                 ['label' => 'Front Page', 'video' => 'tr9bpPCO9UI', 'route' => 'home'],
                 ['label' => 'Investment', 'video' => 'bYKSOd442mo', 'route' => 'market'],
                 ['label' => 'Realtors', 'video' => 'ifpPtWL5awY', 'route' => 'agents'],
-                ['label' => 'Not yet upload', 'video' => 'dZrhegqp9Jw', 'href' => 'https://youtube.com/shorts/dZrhegqp9Jw?si=bSN2hR6qtcZ4Ltxc'],
+                ['label' => 'Construction', 'video' => 'dZrhegqp9Jw', 'href' => 'https://youtube.com/shorts/dZrhegqp9Jw?si=bSN2hR6qtcZ4Ltxc'],
             ] as $video)
                 <div class="col">
                     <div class="npc-card h-100">
