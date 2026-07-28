@@ -50,6 +50,10 @@
                             <a href="mailto:worldensettlerproperties@gmail.com">worldensettlerproperties@gmail.com</a>
                         </div>
                         <div class="d-flex justify-content-between">
+                            <span class="text-muted">WhatsApp</span>
+                            <a href="https://wa.me/message/JTJEFNARZO4KN1" target="_blank" rel="noopener">Chat with us</a>
+                        </div>
+                        <div class="d-flex justify-content-between">
                             <span class="text-muted">Response time</span>
                             <span>Within 24 hours</span>
                         </div>

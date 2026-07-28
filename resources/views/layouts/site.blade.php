@@ -50,7 +50,15 @@
                     <div class="col-lg-4">
                         <h5 class="fw-bold">Worlden Settler Properties</h5>
                         <p class="text-muted">Discover verified listings, connect with trusted professionals, and monitor market trends across Nigeria.</p>
-                        <p class="text-muted mb-0"><a href="mailto:worldensettlerproperties@gmail.com" class="text-muted">worldensettlerproperties@gmail.com</a></p>
+                        <p class="text-muted mb-2"><a href="mailto:worldensettlerproperties@gmail.com" class="text-muted">worldensettlerproperties@gmail.com</a></p>
+                        <p class="text-muted mb-2"><a href="https://wa.me/message/JTJEFNARZO4KN1" class="text-muted" target="_blank" rel="noopener">Chat with us on WhatsApp</a></p>
+                        <ul class="list-inline mb-0">
+                            <li class="list-inline-item"><a href="https://www.instagram.com/worldensettlerhq1" class="text-muted" target="_blank" rel="noopener">Instagram</a></li>
+                            <li class="list-inline-item"><a href="https://www.tiktok.com/@worldensettlerproperties" class="text-muted" target="_blank" rel="noopener">TikTok</a></li>
+                            <li class="list-inline-item"><a href="https://www.linkedin.com/in/worldensettlerproperties-933781239" class="text-muted" target="_blank" rel="noopener">LinkedIn</a></li>
+                            <li class="list-inline-item"><a href="https://www.facebook.com/share/1LW3LRfVA9/" class="text-muted" target="_blank" rel="noopener">Facebook</a></li>
+                            <li class="list-inline-item"><a href="https://x.com/worldenp01" class="text-muted" target="_blank" rel="noopener">Twitter/X</a></li>
+                        </ul>
                     </div>
                     <div class="col-6 col-lg-2">
                         <h6 class="text-uppercase text-muted">Company</h6>
