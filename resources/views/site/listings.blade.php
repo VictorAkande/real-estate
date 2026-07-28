@@ -65,13 +65,45 @@
     <div class="container">
         <div class="row g-4">
             @forelse ($listings as $listing)
+                @php
+                    $imageUrl = fn (?string $path) => $path && str_starts_with($path, 'http') ? $path : Storage::url($path);
+                    $slides = collect([$listing->cover_image])
+                        ->merge($listing->images->pluck('image_path'))
+                        ->filter()
+                        ->unique()
+                        ->map($imageUrl)
+                        ->values();
+                    $typeLabel = match ($listing->listing_type) {
+                        'sale', 'land' => 'For Sale',
+                        'rent' => 'For Rent',
+                        'shortlet' => 'Short Let',
+                        default => ucfirst($listing->listing_type),
+                    };
+                @endphp
                 <div class="col-md-6 col-lg-3">
-                    <a class="text-decoration-none text-reset" href="{{ route('listing.detail', $listing) }}">
-                        <div class="npc-card h-100">
-                            <div class="npc-card-img" @if ($listing->cover_image) style="background-image: url('{{ str_starts_with($listing->cover_image, 'http') ? $listing->cover_image : Storage::url($listing->cover_thumb ?? $listing->cover_image) }}');" @endif></div>
+                    <div class="npc-card h-100">
+                        <div class="npc-card-media">
+                            <a class="npc-card-media-link" href="{{ route('listing.detail', $listing) }}" aria-label="{{ $listing->title }}">
+                                <div class="npc-card-img" data-slides="@json($slides)" data-index="0" @if ($slides->isNotEmpty()) style="background-image: url('{{ $slides->first() }}');" @endif></div>
+                            </a>
+                            <div class="npc-card-badges">
+                                <span class="npc-badge npc-badge-type">{{ $typeLabel }}</span>
+                                @if ($listing->property_type)
+                                    <span class="npc-badge npc-badge-property">{{ $listing->property_type }}</span>
+                                @endif
+                            </div>
+                            <button type="button" class="npc-card-heart" aria-label="Save listing">
+                                <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+                            </button>
+                            @if ($slides->count() > 1)
+                                <button type="button" class="npc-card-nav npc-card-nav-prev" data-dir="-1" aria-label="Previous photo">&lsaquo;</button>
+                                <button type="button" class="npc-card-nav npc-card-nav-next" data-dir="1" aria-label="Next photo">&rsaquo;</button>
+                            @endif
+                            <div class="npc-card-location">{{ $listing->location->name ?? 'Nigeria' }}</div>
+                        </div>
+                        <a class="text-decoration-none text-reset" href="{{ route('listing.detail', $listing) }}">
                             <div class="p-3">
                                 <h6 class="fw-bold mb-1">{{ $listing->title }}</h6>
-                                <p class="text-muted small mb-2">{{ $listing->location->name ?? 'Nigeria' }}</p>
                                 <div class="npc-price">₦{{ number_format($listing->price, 2) }}</div>
                                 <div class="text-muted small mt-1">
                                     @if ($listing->listing_type === 'land')
@@ -81,8 +113,8 @@
                                     @endif
                                 </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
                 </div>
             @empty
                 <div class="col-12">
@@ -96,4 +128,26 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.querySelectorAll('.npc-card-nav').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            const media = btn.closest('.npc-card-media');
+            const img = media.querySelector('.npc-card-img');
+            const slides = JSON.parse(img.dataset.slides || '[]');
+            if (!slides.length) return;
+            const index = (parseInt(img.dataset.index || '0', 10) + parseInt(btn.dataset.dir, 10) + slides.length) % slides.length;
+            img.dataset.index = index;
+            img.style.backgroundImage = `url('${slides[index]}')`;
+        });
+    });
+
+    document.querySelectorAll('.npc-card-heart').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            btn.classList.toggle('is-active');
+        });
+    });
+</script>
 @endsection

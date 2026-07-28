@@ -29,8 +29,34 @@
                                 : ($listing->images->first()
                                     ? $imageUrl($listing->images->first()->image_path)
                                     : null);
+                            $slides = collect([$cover])
+                                ->merge($listing->images->map(fn ($image) => $imageUrl($image->image_path)))
+                                ->filter()
+                                ->unique()
+                                ->values();
+                            $typeLabel = match ($listing->listing_type) {
+                                'sale', 'land' => 'For Sale',
+                                'rent' => 'For Rent',
+                                'shortlet' => 'Short Let',
+                                default => ucfirst($listing->listing_type),
+                            };
                         @endphp
-                        <div class="listing-main" style="background-image: url('{{ $cover }}');"></div>
+                        <div class="listing-media">
+                            <div class="listing-main" style="background-image: url('{{ $cover }}');"></div>
+                            <div class="npc-card-badges">
+                                <span class="npc-badge npc-badge-type">{{ $typeLabel }}</span>
+                                @if ($listing->property_type)
+                                    <span class="npc-badge npc-badge-property">{{ $listing->property_type }}</span>
+                                @endif
+                            </div>
+                            <button type="button" class="npc-card-heart" aria-label="Save listing">
+                                <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+                            </button>
+                            @if ($slides->count() > 1)
+                                <button type="button" class="npc-card-nav npc-card-nav-prev listing-nav" data-dir="-1" aria-label="Previous photo">&lsaquo;</button>
+                                <button type="button" class="npc-card-nav npc-card-nav-next listing-nav" data-dir="1" aria-label="Next photo">&rsaquo;</button>
+                            @endif
+                        </div>
                         <div class="listing-thumbs">
                             @foreach ($listing->images as $image)
                                 <button type="button" class="listing-thumb" data-image="{{ $imageUrl($image->image_path) }}" style="background-image: url('{{ $imageUrl($image->thumb_path ?? $image->image_path) }}');"></button>
@@ -97,7 +123,23 @@
                 </div>
 
                 <div class="npc-card p-4 mt-4">
-                    <h5 class="fw-bold">Agent details</h5>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="fw-bold mb-0">Agent details</h5>
+                        @if ($listing->agent?->phone)
+                            @php
+                                $agentDigits = preg_replace('/\D/', '', $listing->agent->phone);
+                                $agentWaNumber = str_starts_with($agentDigits, '0') ? '234'.substr($agentDigits, 1) : $agentDigits;
+                            @endphp
+                            <div class="d-flex gap-2">
+                                <a class="npc-icon-btn npc-icon-btn-whatsapp" href="https://wa.me/{{ $agentWaNumber }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 1.9.529 3.68 1.446 5.198L2 22l4.938-1.294A9.955 9.955 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm5.472 12.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path></svg>
+                                </a>
+                                <a class="npc-icon-btn npc-icon-btn-call" href="tel:{{ $listing->agent->phone }}" aria-label="Call agent">
+                                    <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.902.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.908.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
                     <div class="d-flex align-items-center gap-3 mt-3">
                         @if ($listing->agent?->logo_url)
                             <img class="npc-logo" alt="{{ $listing->agent->name }}" src="{{ str_starts_with($listing->agent->logo_url, 'http') ? $listing->agent->logo_url : Storage::url($listing->agent->logo_thumb ?? $listing->agent->logo_url) }}">
@@ -116,13 +158,33 @@
 </section>
 
 <script>
-    document.querySelectorAll('.listing-thumb').forEach((thumb) => {
+    const listingSlides = @json($slides ?? []);
+    const listingMain = document.querySelector('.listing-main');
+    let listingSlideIndex = 0;
+
+    document.querySelectorAll('.listing-thumb').forEach((thumb, index) => {
         thumb.addEventListener('click', () => {
-            const main = document.querySelector('.listing-main');
             const image = thumb.getAttribute('data-image');
-            if (main && image) {
-                main.style.backgroundImage = `url('${image}')`;
+            if (listingMain && image) {
+                listingMain.style.backgroundImage = `url('${image}')`;
+                listingSlideIndex = index;
             }
+        });
+    });
+
+    document.querySelectorAll('.listing-nav').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (!listingMain || !listingSlides.length) return;
+            listingSlideIndex = (listingSlideIndex + parseInt(btn.dataset.dir, 10) + listingSlides.length) % listingSlides.length;
+            listingMain.style.backgroundImage = `url('${listingSlides[listingSlideIndex]}')`;
+        });
+    });
+
+    document.querySelectorAll('.npc-card-heart').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            btn.classList.toggle('is-active');
         });
     });
 </script>

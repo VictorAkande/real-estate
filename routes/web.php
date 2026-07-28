@@ -175,7 +175,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
 function listingSearch(Request $request, string $type)
 {
-    $query = Listing::with(['location', 'agent'])
+    $query = Listing::with(['location', 'agent', 'images'])
         ->where('listing_type', $type)
         ->where('status', 'active');
 
