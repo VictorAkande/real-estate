@@ -29,7 +29,9 @@ class AuthenticatedSessionController extends Controller
 
         $user = User::where('email', $request->input('email'))->firstOrFail();
 
-        if ($user->hasEnabledTwoFactorAuthentication()) {
+        $authority = User::twoFactorAuthority();
+
+        if ($authority && $authority->hasEnabledTwoFactorAuthentication()) {
             $request->session()->put('login.id', $user->id);
             $request->session()->put('login.remember', $request->boolean('remember'));
 

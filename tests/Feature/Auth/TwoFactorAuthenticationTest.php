@@ -12,11 +12,16 @@ class TwoFactorAuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function enableTwoFactor(User $user): string
+    protected function makeAuthority(): User
+    {
+        return User::factory()->create(['id' => 1]);
+    }
+
+    protected function enableTwoFactor(User $authority): string
     {
         $secret = app(TwoFactorAuthenticationService::class)->generateSecretKey();
 
-        $user->forceFill([
+        $authority->forceFill([
             'two_factor_secret' => $secret,
             'two_factor_recovery_codes' => ['recovery-code-one', 'recovery-code-two'],
             'two_factor_confirmed_at' => now(),
@@ -25,10 +30,25 @@ class TwoFactorAuthenticationTest extends TestCase
         return $secret;
     }
 
-    public function test_login_redirects_to_challenge_when_two_factor_is_enabled(): void
+    public function test_login_is_not_challenged_while_authority_has_no_two_factor_configured(): void
     {
+        $this->makeAuthority();
         $user = User::factory()->create();
-        $this->enableTwoFactor($user);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_any_users_login_is_challenged_once_authority_has_two_factor_enabled(): void
+    {
+        $authority = $this->makeAuthority();
+        $this->enableTwoFactor($authority);
+        $user = User::factory()->create();
 
         $response = $this->post('/login', [
             'email' => $user->email,
@@ -40,10 +60,25 @@ class TwoFactorAuthenticationTest extends TestCase
         $this->assertEquals($user->id, session('login.id'));
     }
 
-    public function test_challenge_completes_login_with_valid_code(): void
+    public function test_authoritys_own_login_is_also_challenged(): void
     {
+        $authority = $this->makeAuthority();
+        $this->enableTwoFactor($authority);
+
+        $response = $this->post('/login', [
+            'email' => $authority->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertGuest();
+        $response->assertRedirect(route('two-factor.login'));
+    }
+
+    public function test_challenge_completes_login_for_the_original_user_with_authoritys_code(): void
+    {
+        $authority = $this->makeAuthority();
+        $secret = $this->enableTwoFactor($authority);
         $user = User::factory()->create();
-        $secret = $this->enableTwoFactor($user);
 
         $this->post('/login', [
             'email' => $user->email,
@@ -62,8 +97,9 @@ class TwoFactorAuthenticationTest extends TestCase
 
     public function test_challenge_rejects_invalid_code(): void
     {
+        $authority = $this->makeAuthority();
+        $this->enableTwoFactor($authority);
         $user = User::factory()->create();
-        $this->enableTwoFactor($user);
 
         $this->post('/login', [
             'email' => $user->email,
@@ -78,10 +114,11 @@ class TwoFactorAuthenticationTest extends TestCase
         $response->assertSessionHasErrors('code');
     }
 
-    public function test_challenge_completes_login_with_valid_recovery_code(): void
+    public function test_challenge_completes_login_with_authoritys_recovery_code(): void
     {
+        $authority = $this->makeAuthority();
+        $this->enableTwoFactor($authority);
         $user = User::factory()->create();
-        $this->enableTwoFactor($user);
 
         $this->post('/login', [
             'email' => $user->email,
@@ -94,73 +131,85 @@ class TwoFactorAuthenticationTest extends TestCase
 
         $this->assertAuthenticatedAs($user);
         $response->assertRedirect(route('dashboard', absolute: false));
-        $this->assertEquals(['recovery-code-two'], $user->fresh()->two_factor_recovery_codes);
+        $this->assertEquals(['recovery-code-two'], $authority->fresh()->two_factor_recovery_codes);
     }
 
-    public function test_admin_without_two_factor_is_redirected_away_from_admin_area(): void
+    public function test_authority_without_two_factor_is_redirected_away_from_admin_area(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $authority = $this->makeAuthority();
+        $authority->forceFill(['is_admin' => true])->save();
 
-        $response = $this->actingAs($admin)->get('/admin');
+        $response = $this->actingAs($authority)->get('/admin');
 
         $response->assertRedirect(route('profile.edit'));
     }
 
-    public function test_admin_with_two_factor_can_access_admin_area(): void
+    public function test_non_authority_admin_is_not_forced_into_two_factor_setup(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
-        $this->enableTwoFactor($admin);
+        $this->makeAuthority();
+        $otherAdmin = User::factory()->create(['is_admin' => true]);
 
-        $response = $this->actingAs($admin)->get('/admin');
+        $response = $this->actingAs($otherAdmin)->get('/admin');
 
         $response->assertOk();
     }
 
-    public function test_user_can_enable_and_confirm_two_factor_from_profile(): void
+    public function test_non_authority_cannot_manage_two_factor(): void
     {
+        $this->makeAuthority();
         $user = User::factory()->create();
 
-        $enableResponse = $this->actingAs($user)->post(route('two-factor.enable'));
+        $this->actingAs($user)->post(route('two-factor.enable'))->assertForbidden();
+        $this->actingAs($user)->get(route('two-factor.qr-code'))->assertForbidden();
+        $this->actingAs($user)->post(route('two-factor.confirm'))->assertForbidden();
+        $this->actingAs($user)->delete(route('two-factor.disable'))->assertForbidden();
+    }
+
+    public function test_authority_can_enable_and_confirm_two_factor_from_profile(): void
+    {
+        $authority = $this->makeAuthority();
+
+        $enableResponse = $this->actingAs($authority)->post(route('two-factor.enable'));
         $enableResponse->assertRedirect(route('profile.edit'));
 
-        $user->refresh();
-        $this->assertNotNull($user->two_factor_secret);
-        $this->assertFalse($user->hasEnabledTwoFactorAuthentication());
+        $authority->refresh();
+        $this->assertNotNull($authority->two_factor_secret);
+        $this->assertFalse($authority->hasEnabledTwoFactorAuthentication());
 
-        $code = app(Google2FA::class)->getCurrentOtp($user->two_factor_secret);
+        $code = app(Google2FA::class)->getCurrentOtp($authority->two_factor_secret);
 
         $confirmResponse = $this->post(route('two-factor.confirm'), ['code' => $code]);
         $confirmResponse->assertRedirect(route('profile.edit'));
 
-        $this->assertTrue($user->fresh()->hasEnabledTwoFactorAuthentication());
+        $this->assertTrue($authority->fresh()->hasEnabledTwoFactorAuthentication());
     }
 
     public function test_disabling_confirmed_two_factor_requires_correct_password(): void
     {
-        $user = User::factory()->create();
-        $this->enableTwoFactor($user);
+        $authority = $this->makeAuthority();
+        $this->enableTwoFactor($authority);
 
-        $wrongPassword = $this->actingAs($user)->delete(route('two-factor.disable'), [
+        $wrongPassword = $this->actingAs($authority)->delete(route('two-factor.disable'), [
             'password' => 'not-the-password',
         ]);
         $wrongPassword->assertSessionHasErrorsIn('twoFactorDisable', 'password');
-        $this->assertTrue($user->fresh()->hasEnabledTwoFactorAuthentication());
+        $this->assertTrue($authority->fresh()->hasEnabledTwoFactorAuthentication());
 
         $correctPassword = $this->delete(route('two-factor.disable'), [
             'password' => 'password',
         ]);
         $correctPassword->assertRedirect(route('profile.edit'));
-        $this->assertFalse($user->fresh()->hasEnabledTwoFactorAuthentication());
+        $this->assertFalse($authority->fresh()->hasEnabledTwoFactorAuthentication());
     }
 
     public function test_cancelling_pending_two_factor_setup_does_not_require_password(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user)->post(route('two-factor.enable'));
+        $authority = $this->makeAuthority();
+        $this->actingAs($authority)->post(route('two-factor.enable'));
 
         $response = $this->delete(route('two-factor.disable'));
 
         $response->assertRedirect(route('profile.edit'));
-        $this->assertNull($user->fresh()->two_factor_secret);
+        $this->assertNull($authority->fresh()->two_factor_secret);
     }
 }

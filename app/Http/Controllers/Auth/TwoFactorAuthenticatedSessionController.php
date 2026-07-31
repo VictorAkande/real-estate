@@ -42,15 +42,16 @@ class TwoFactorAuthenticatedSessionController extends Controller
         ]);
 
         $user = User::findOrFail($userId);
+        $authority = User::twoFactorAuthority();
 
         if ($code = $request->input('code')) {
-            if (! $service->verify($user->two_factor_secret, $code)) {
+            if (! $authority || ! $service->verify($authority->two_factor_secret, $code)) {
                 throw ValidationException::withMessages([
                     'code' => __('The provided code is invalid.'),
                 ]);
             }
         } elseif ($recoveryCode = $request->input('recovery_code')) {
-            $codes = $user->recoveryCodes();
+            $codes = $authority?->recoveryCodes() ?? [];
             $matched = collect($codes)->first(fn ($stored) => hash_equals($stored, $recoveryCode));
 
             if (! $matched) {
@@ -59,7 +60,7 @@ class TwoFactorAuthenticatedSessionController extends Controller
                 ]);
             }
 
-            $user->forceFill([
+            $authority->forceFill([
                 'two_factor_recovery_codes' => array_values(array_diff($codes, [$matched])),
             ])->save();
         } else {

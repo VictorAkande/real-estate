@@ -62,4 +62,14 @@ class User extends Authenticatable
     {
         return $this->two_factor_recovery_codes ?? [];
     }
+
+    public function isTwoFactorAuthority(): bool
+    {
+        return $this->id === config('two-factor.authority_id');
+    }
+
+    public static function twoFactorAuthority(): ?self
+    {
+        return static::find(config('two-factor.authority_id'));
+    }
 }

@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div id="two-factor-code-section" @class(['d-none' => $errors->has('recovery_code')])>
         <p class="text-muted">
-            {{ __('Please confirm access to your account by entering the authentication code provided by your authenticator app.') }}
+            {{ __('Please contact the site administrator for the current authentication code, then enter it below to continue.') }}
         </p>
 
         <form method="POST" action="{{ route('two-factor.login') }}" class="d-grid gap-3">
@@ -24,7 +24,7 @@
 
     <div id="two-factor-recovery-section" @class(['d-none' => ! $errors->has('recovery_code')])>
         <p class="text-muted">
-            {{ __('Please confirm access to your account by entering one of your emergency recovery codes.') }}
+            {{ __('Please contact the site administrator for one of the emergency recovery codes, then enter it below to continue.') }}
         </p>
 
         <form method="POST" action="{{ route('two-factor.login') }}" class="d-grid gap-3">

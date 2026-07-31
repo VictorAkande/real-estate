@@ -8,7 +8,7 @@
     <div class="py-4">
         @if (session('status') === 'two-factor-required')
             <div class="alert alert-warning">
-                {{ __('Two-factor authentication is required for admin accounts. Please set it up below.') }}
+                {{ __('Two-factor authentication must be set up on this account before continuing. Please set it up below.') }}
             </div>
         @endif
 
@@ -29,13 +29,15 @@
                 </div>
             </div>
 
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                    @include('profile.partials.two-factor-authentication-form')
+            @if ($user->isTwoFactorAuthority())
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                        @include('profile.partials.two-factor-authentication-form')
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
             <div class="col-12">
                 <div class="card shadow-sm">

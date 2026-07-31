@@ -9,13 +9,13 @@
         </h2>
 
         <p class="text-muted mb-0">
-            {{ __('Add additional security to your account by requiring a code from an authenticator app (such as Google Authenticator) at login.') }}
+            {{ __('This account\'s authenticator app gates every login on the site. Once enabled, anyone logging in (including you) must enter the current code from this authenticator app after their password.') }}
         </p>
     </header>
 
     <div class="mt-3">
         @if (! $user->two_factor_secret)
-            <p class="text-muted">{{ __('You have not enabled two-factor authentication.') }}</p>
+            <p class="text-muted">{{ __('Two-factor authentication is not enabled. Every account can currently log in with just a password.') }}</p>
 
             <form method="POST" action="{{ route('two-factor.enable') }}">
                 @csrf
@@ -53,11 +53,11 @@
                 <x-secondary-button>{{ __('Cancel Setup') }}</x-secondary-button>
             </form>
         @else
-            <p class="text-success">{{ __('Two-factor authentication is enabled.') }}</p>
+            <p class="text-success">{{ __('Two-factor authentication is enabled. Every login now requires the current code from this authenticator app.') }}</p>
 
             <div class="mb-3">
                 <p class="mb-1">
-                    {{ __('Recovery codes — store these somewhere safe. Each one can be used once to log in if you lose access to your authenticator app.') }}
+                    {{ __('Recovery codes — store these somewhere safe. Each one can be used once in place of the live code if you lose access to this authenticator app.') }}
                 </p>
                 <div class="bg-light p-3 rounded font-monospace small">
                     @foreach ($user->recoveryCodes() as $recoveryCode)
