@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ListingEnquiryController;
+use App\Http\Controllers\TwoFactorAuthenticationController;
 use App\Http\Controllers\Admin\AdminAgentController;
 use App\Http\Controllers\Admin\AdminAreaGuideController;
 use App\Http\Controllers\Admin\AdminContentController;
@@ -158,7 +159,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', 'two_factor'])->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('listings', AdminListingController::class)->names('listings');
     Route::post('listings/gallery/ajax-upload', [AdminListingController::class, 'uploadGalleryImageAjax'])->name('listings.gallery.ajax-upload');
@@ -173,6 +174,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('area-guides', AdminAreaGuideController::class)->parameters(['area-guides' => 'area_guide'])->names('area-guides');
 });
 
+if (! function_exists('listingSearch')) {
 function listingSearch(Request $request, string $type)
 {
     $query = Listing::with(['location', 'agent', 'images'])
@@ -222,11 +224,19 @@ function listingSearch(Request $request, string $type)
 
     return $query->paginate(12)->withQueryString();
 }
+}
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth', 'password.confirm'])->group(function () {
+    Route::post('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'store'])->name('two-factor.enable');
+    Route::delete('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'destroy'])->name('two-factor.disable');
+    Route::get('/user/two-factor-qr-code', [TwoFactorAuthenticationController::class, 'qrCode'])->name('two-factor.qr-code');
+    Route::post('/user/confirmed-two-factor-authentication', [TwoFactorAuthenticationController::class, 'confirm'])->name('two-factor.confirm');
 });
 
 require __DIR__.'/auth.php';
