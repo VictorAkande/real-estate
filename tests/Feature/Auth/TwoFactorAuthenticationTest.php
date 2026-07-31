@@ -115,4 +115,52 @@ class TwoFactorAuthenticationTest extends TestCase
 
         $response->assertOk();
     }
+
+    public function test_user_can_enable_and_confirm_two_factor_from_profile(): void
+    {
+        $user = User::factory()->create();
+
+        $enableResponse = $this->actingAs($user)->post(route('two-factor.enable'));
+        $enableResponse->assertRedirect(route('profile.edit'));
+
+        $user->refresh();
+        $this->assertNotNull($user->two_factor_secret);
+        $this->assertFalse($user->hasEnabledTwoFactorAuthentication());
+
+        $code = app(Google2FA::class)->getCurrentOtp($user->two_factor_secret);
+
+        $confirmResponse = $this->post(route('two-factor.confirm'), ['code' => $code]);
+        $confirmResponse->assertRedirect(route('profile.edit'));
+
+        $this->assertTrue($user->fresh()->hasEnabledTwoFactorAuthentication());
+    }
+
+    public function test_disabling_confirmed_two_factor_requires_correct_password(): void
+    {
+        $user = User::factory()->create();
+        $this->enableTwoFactor($user);
+
+        $wrongPassword = $this->actingAs($user)->delete(route('two-factor.disable'), [
+            'password' => 'not-the-password',
+        ]);
+        $wrongPassword->assertSessionHasErrorsIn('twoFactorDisable', 'password');
+        $this->assertTrue($user->fresh()->hasEnabledTwoFactorAuthentication());
+
+        $correctPassword = $this->delete(route('two-factor.disable'), [
+            'password' => 'password',
+        ]);
+        $correctPassword->assertRedirect(route('profile.edit'));
+        $this->assertFalse($user->fresh()->hasEnabledTwoFactorAuthentication());
+    }
+
+    public function test_cancelling_pending_two_factor_setup_does_not_require_password(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)->post(route('two-factor.enable'));
+
+        $response = $this->delete(route('two-factor.disable'));
+
+        $response->assertRedirect(route('profile.edit'));
+        $this->assertNull($user->fresh()->two_factor_secret);
+    }
 }

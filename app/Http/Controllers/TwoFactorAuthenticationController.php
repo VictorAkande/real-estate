@@ -68,6 +68,12 @@ class TwoFactorAuthenticationController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        if ($request->user()->hasEnabledTwoFactorAuthentication()) {
+            $request->validateWithBag('twoFactorDisable', [
+                'password' => ['required', 'current_password'],
+            ]);
+        }
+
         $request->user()->forceFill([
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,

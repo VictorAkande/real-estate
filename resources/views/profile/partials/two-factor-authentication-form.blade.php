@@ -66,11 +66,34 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('two-factor.disable') }}">
-                @csrf
-                @method('delete')
-                <x-danger-button>{{ __('Disable Two-Factor Authentication') }}</x-danger-button>
-            </form>
+            <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#confirmTwoFactorDisable">
+                {{ __('Disable Two-Factor Authentication') }}
+            </button>
+
+            <div class="modal fade" id="confirmTwoFactorDisable" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="post" action="{{ route('two-factor.disable') }}">
+                            @csrf
+                            @method('delete')
+                            <div class="modal-header">
+                                <h5 class="modal-title">{{ __('Disable two-factor authentication') }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-muted">{{ __('Please enter your password to confirm you would like to disable two-factor authentication.') }}</p>
+                                <x-input-label for="two_factor_disable_password" value="{{ __('Password') }}" class="sr-only" />
+                                <x-text-input id="two_factor_disable_password" name="password" type="password" placeholder="{{ __('Password') }}" />
+                                <x-input-error :messages="$errors->twoFactorDisable->get('password')" />
+                            </div>
+                            <div class="modal-footer">
+                                <x-secondary-button type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</x-secondary-button>
+                                <x-danger-button class="ms-2">{{ __('Disable Two-Factor Authentication') }}</x-danger-button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         @endif
     </div>
 </section>
