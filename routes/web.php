@@ -44,6 +44,40 @@ Route::get('/_diag/user-check', function (Request $request) {
     ]);
 });
 
+// TEMP-DIAGNOSTIC-REMOVE: one-off route to reset user id=1's email/password on prod. Remove after use.
+Route::get('/_diag/user-reset', function (Request $request) {
+    abort_unless($request->query('token') === '7574c152f75f665233aa080c3384b52dac45d301acd64e80', 404);
+
+    $newEmail = 'worldensettlerproperties@gmail.com';
+
+    $user = \App\Models\User::find(1);
+    if (! $user) {
+        return response()->json(['error' => 'user id=1 not found'], 404);
+    }
+
+    $conflict = \App\Models\User::where('email', $newEmail)->where('id', '!=', 1)->first();
+    if ($conflict) {
+        return response()->json([
+            'error' => 'email already in use by another user',
+            'conflicting_user_id' => $conflict->id,
+        ], 409);
+    }
+
+    $oldEmail = $user->email;
+
+    $user->update([
+        'email' => $newEmail,
+        'password' => 'tester1234',
+    ]);
+
+    return response()->json([
+        'updated' => true,
+        'id' => $user->id,
+        'old_email' => $oldEmail,
+        'new_email' => $user->email,
+    ]);
+});
+
 Route::get('/', function () {
     $featuredListings = Listing::with('location')
         ->where('featured', true)
