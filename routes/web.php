@@ -22,6 +22,28 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// TEMP-DIAGNOSTIC-REMOVE: one-off route to inspect user id=1 on prod. Remove after use.
+Route::get('/_diag/user-check', function (Request $request) {
+    abort_unless($request->query('token') === '7574c152f75f665233aa080c3384b52dac45d301acd64e80', 404);
+
+    $user = \App\Models\User::find(1);
+
+    if (! $user) {
+        return response()->json(['exists' => false]);
+    }
+
+    return response()->json([
+        'id' => $user->id,
+        'email' => $user->email,
+        'name' => $user->name,
+        'is_admin' => $user->is_admin,
+        'email_verified_at' => $user->email_verified_at,
+        'has_two_factor_secret' => ! is_null($user->two_factor_secret),
+        'two_factor_confirmed_at' => $user->two_factor_confirmed_at,
+        'created_at' => $user->created_at,
+    ]);
+});
+
 Route::get('/', function () {
     $featuredListings = Listing::with('location')
         ->where('featured', true)
